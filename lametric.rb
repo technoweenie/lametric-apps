@@ -2,24 +2,19 @@ require "sinatra"
 require "json"
 require "octokit"
 
-get "/github-repository-stats/*" do
-  repos = []
-  params[:splat].first.split("/").each_with_index do |part, idx|
-    if idx % 2 == 0 # even
-      repos << part
-    else
-      repos.last << "/#{part}"
-    end
-  end
-  repos.delete_if { |r| !r.include?("/") }
-
+get "/github-repository-stats" do
   cache_control :public, max_age: 540
   content_type :json
+
+  repos = %w(
+    github/git-lfs
+    lostisland/faraday
+  )
 
   {
     :frames => [
       :index => 0,
-      :text => "Stats\n" + status_for_repositories(repos.first(5)),
+      :text => "Stats\n" + status_for_repositories(repos),
       :icon => "i2184",
     ]
   }.to_json
