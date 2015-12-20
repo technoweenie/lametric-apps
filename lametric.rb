@@ -17,7 +17,7 @@ end
 
 get "/github-repository-stats/*" do
   repos = []
-  params[:splat].each_with_index do |part, idx|
+  params["splat"].each_with_index do |part, idx|
     if idx % 2 == 0 # even
       repos << part
     else
