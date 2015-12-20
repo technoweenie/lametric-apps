@@ -14,7 +14,7 @@ get "/github-repository-stats" do
   {
     :frames => [
       :index => 0,
-      :text => "Stats\n" + status_for_repositories(repos),
+      :text => "Stats: " + status_for_repositories(repos),
       :icon => "i2184",
     ]
   }.to_json
@@ -24,5 +24,5 @@ def status_for_repositories(repositories)
   repositories.map do |nwo|
     repository = Octokit.repository(nwo)
     "#{repository.name} #{repository.stargazers_count}/#{repository.subscribers_count}"
-  end.join("\n")
+  end.join(", ")
 end
