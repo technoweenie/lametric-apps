@@ -77,8 +77,10 @@ post "/github/events" do
 end
 
 LAMETRIC_PUSH_URI = URI(ENV["LAMETRIC_PUSH_URL"].to_s)
-LAMETRIC_HTTP_ARGS = [LAMETRIC_PUSH_URI.hostname, LAMETRIC_PUSH_URI.port,
-  {:use_ssl => LAMETRIC_PUSH_URI.scheme == "https"}]
+LAMETRIC_HTTP_ARGS = [
+  LAMETRIC_PUSH_URI.hostname, LAMETRIC_PUSH_URI.port,
+  {:use_ssl => LAMETRIC_PUSH_URI.scheme == "https"}
+]
 
 def lametric_post(frames)
   frames.each_with_index do |f, i|
