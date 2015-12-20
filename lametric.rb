@@ -2,28 +2,29 @@ require "sinatra"
 require "json"
 require "octokit"
 
-get "/github-repository-stats" do
+get "/github-repository-stats/:o/:r" do
   cache_control :public, max_age: 540
   content_type :json
 
-  repos = %w(
-    github/git-lfs
-    lostisland/faraday
-  )
+  repo = Octokit.repository("#{params[:o]}/#{params[:r]}")
 
-  frames = frames_for_repositories(repos)
-  frames.each_with_index do |f, i|
-    f[:index] = i
-  end
-
-  { :frames => frames }.to_json
-end
-
-def frames_for_repositories(repositories)
-  repositories.inject([]) do |frames, nwo|
-    repository = Octokit.repository(nwo)
-    frames << {:text => repository.name, :icon => "i2184"}
-    frames << {:text => repository.stargazers_count.to_s, :icon => "i635"}
-    frames << {:text => repository.subscribers_count.to_s, :icon => "i2185"}
-  end
+  {
+    :frames => [
+      {
+        :index => 0,
+        :text => repo.name,
+        :icon => "i2184",
+      },
+      {
+        :index => 1,
+        :text => repo.stargazers_count.to_s,
+        :icon => "i635",
+      },
+      {
+        :index => 2,
+        :text => repo.subscribers_count.to_s,
+        :icon => "i2185",
+      },
+    ]
+  }.to_json
 end
