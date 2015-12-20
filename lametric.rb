@@ -9,7 +9,7 @@ get "/git-lfs" do
   {
     :frames => [
       :index => 0,
-      :text => "Git LFS: #{repository.stargazers_count}/#{repository.watchers_count}",
+      :text => "Git LFS: #{repository.stargazers_count}/#{repository.subscribers_count}",
       :icon => "i2184",
     ]
   }.to_json
