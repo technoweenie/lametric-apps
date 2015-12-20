@@ -17,13 +17,14 @@ end
 
 get "/github-repository-stats/*" do
   repos = []
-  params["splat"].each_with_index do |part, idx|
+  params[:splat].each_with_index do |part, idx|
     if idx % 2 == 0 # even
       repos << part
     else
       repos.last << "/#{part}"
     end
   end
+  repos.delete_if { |r| !r.include?("/") }
 
   cache_control :public, max_age: 540
 
