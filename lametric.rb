@@ -3,7 +3,7 @@ require "json"
 require "octokit"
 
 get "/git-lfs" do
-  cache_control :public, max_age: 480
+  cache_control :public, max_age: 540
 
   repository = Octokit.repository("github/git-lfs")
   {
@@ -15,9 +15,17 @@ get "/git-lfs" do
   }.to_json
 end
 
-get "/github-repository-stats" do
-  repos = params[:r].to_s.split(",").each(&:strip!)
-  cache_control :public, max_age: 480
+get "/github-repository-stats/*" do
+  repos = []
+  params[:splat].each_with_index do |part, idx|
+    if idx % 2 == 0 # even
+      repos << part
+    else
+      repos.last << "/#{part}"
+    end
+  end
+
+  cache_control :public, max_age: 540
 
   {
     :frames => [
