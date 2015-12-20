@@ -11,18 +11,23 @@ get "/github-repository-stats" do
     lostisland/faraday
   )
 
-  {
-    :frames => [
-      :index => 0,
-      :text => "Stats: " + status_for_repositories(repos),
+  lines = lines_for_repositories(repos)
+  frames = []
+  lines.each_with_index do |l, i|
+    frames << {
+      :index => i,
+      :text => l,
       :icon => "i2184",
-    ]
-  }.to_json
+    }
+  end
+
+  { :frames => frames }.to_json
 end
 
-def status_for_repositories(repositories)
-  repositories.map do |nwo|
+def lines_for_repositories(repositories)
+  repositories.inject([]) do |frames, nwo|
     repository = Octokit.repository(nwo)
-    "#{repository.name} #{repository.stargazers_count}/#{repository.subscribers_count}"
-  end.join(", ")
+    frames << repository.name
+    frames << "#{repository.stargazers_count}/#{repository.subscribers_count}"
+  end
 end
