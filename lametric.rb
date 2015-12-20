@@ -19,7 +19,7 @@ get "/github-repository-stats/*" do
   {
     :frames => [
       :index => 0,
-      :text => status_for_repositories(repos.first(5)),
+      :text => "GitHub stats: " + status_for_repositories(repos.first(5)),
       :icon => "i2184",
     ]
   }.to_json
