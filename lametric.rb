@@ -60,7 +60,7 @@ EVENTS = {
     lametric_post(
       [
         {
-          :text => "#{repo} #{stars} (@#{sender})",
+          :text => "#{repo} #{sender} (#{stars})",
           :icon => :star,
         },
       ],
