@@ -54,12 +54,13 @@ EVENTS = {
 
   "watch" => lambda { |json|
     repo = fetch_value(json, "repository", "name") || "???"
+    stars = fetch_value(json, "repository", "stargazers_count") || "?"
     sender = fetch_value(json, "sender", "login") || "???"
 
     lametric_post(
       [
         {
-          :text => "#{repo}: #{sender}",
+          :text => "#{repo} #{stars} (@#{sender})",
           :icon => :star,
         },
       ],
