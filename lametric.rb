@@ -8,6 +8,7 @@ ICONS = {
   :star => "i635",
   :watcher => "i2185",
   :open_issue => "i2186",
+  :closed_issue => "i2187",
 }
 
 get "/github/repository-stats/:o/:r" do
@@ -51,12 +52,20 @@ EVENTS = {
     pull = fetch_value(json, "pull_request", "title") || "???"
     sender = fetch_value(json, "sender", "login") || "???"
 
-    nwo = fetch_value(json, "repository", "full_name")
-    repo = Octokit.repository(nwo)
-    lametric_repo_post(repo,
-      :message => "#{repo.name}: #{pull} by #{sender}",
-      :icon => :open_issue,
-    )
+
+    icon = case json["action"]
+    when "opened", "reopened" then :open_issue
+    when "closed" then :closed_issue
+    end
+
+    if icon
+      nwo = fetch_value(json, "repository", "full_name")
+      repo = Octokit.repository(nwo)
+      lametric_repo_post(repo,
+        :message => "#{repo.name}: #{pull} by #{sender}",
+        :icon => icon,
+      )
+    end
   },
 
   "watch" => lambda { |json|
@@ -89,7 +98,7 @@ def lametric_repo_post(repo, options = {})
         :icon => first_icon,
       },
       {
-        :text => "#{repo.open_issues_count}#{" +" if first_icon == :open_issue}",
+        :text => "#{repo.open_issues_count}#{" +" if first_icon == :open_issue}#{" -" if first_icon == :closed_issue}",
         :icon => :open_issue,
       },
       {
