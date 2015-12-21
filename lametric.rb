@@ -42,9 +42,10 @@ EVENTS = {
     pull = fetch_value(json, "pull_request", "title") || "???"
     sender = fetch_value(json, "sender", "login") || "???"
 
-    repo = json["repository"]
+    nwo = fetch_value(json, "repository", "full_name")
+    repo = Octokit.repository(nwo)
     lametric_repo_post(repo,
-      :message => "#{repo["name"]}: #{pull} by #{sender}",
+      :message => "#{repo.name}: #{pull} by #{sender}",
     )
   },
 
@@ -52,9 +53,10 @@ EVENTS = {
     stars = fetch_value(json, "repository", "stargazers_count") || "?"
     sender = fetch_value(json, "sender", "login") || "???"
 
-    repo = json["repository"]
+    nwo = fetch_value(json, "repository", "full_name")
+    repo = Octokit.repository(nwo)
     lametric_repo_post(repo,
-      :message => "#{repo["name"]} by #{sender}",
+      :message => "#{repo.name} by #{sender}",
       :icon => :star,
     )
   },
@@ -86,15 +88,15 @@ def lametric_repo_post(repo, options = {})
         :icon => first_icon,
       },
       {
-        :text => repo["open_issues_count"] || "?",
+        :text => repo.open_issues_count.to_s,
         :icon => :open_issue,
       },
       {
-        :text => repo["stargazers_count"] || "?",
+        :text => repo.stargazers_count.to_s,
         :icon => :star,
       },
       {
-        :text => repo["subscribers_count"] || "?",
+        :text => repo.subscribers_count.to_s,
         :icon => :watcher,
       },
     ],
