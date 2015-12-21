@@ -46,10 +46,6 @@ EVENTS = {
     lametric_repo_post(repo,
       :message => "#{repo["name"]}: #{pull} by #{sender}",
     )
-
-    sleep 10
-
-    lametric_repo_post(repo)
   },
 
   "watch" => lambda { |json|
@@ -61,10 +57,6 @@ EVENTS = {
       :message => "#{repo["name"]} by #{sender}",
       :icon => :star,
     )
-
-    sleep 5
-
-    lametric_repo_post(repo)
   },
 }
 
@@ -102,11 +94,15 @@ def lametric_repo_post(repo, options = {})
         :icon => :star,
       },
       {
-        :text => repo["subscribers_count"] || "?",
+        :text => repo["subscribers_count"] || repo["watchers_count"] || "?",
         :icon => :watcher,
       },
     ],
   )
+
+  return if options.empty?
+  sleep 15
+  lametric_repo_post(repo)
 end
 
 def lametric_post(frames)
