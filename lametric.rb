@@ -37,6 +37,15 @@ get "/github/repository-stats/:o/:r" do
   }.to_json
 end
 
+post "/github/events" do
+  event_type = env["HTTP_X_GITHUB_EVENT"]
+  if b = EVENTS[event_type]
+    b.call(JSON.parse(request.body.read))
+  else
+    "Bad event type: #{event_type.inspect}"
+  end
+end
+
 EVENTS = {
   "pull_request" => lambda { |json|
     pull = fetch_value(json, "pull_request", "title") || "???"
@@ -62,15 +71,6 @@ EVENTS = {
     )
   },
 }
-
-post "/github/events" do
-  event_type = env["HTTP_X_GITHUB_EVENT"]
-  if b = EVENTS[event_type]
-    b.call(JSON.parse(request.body.read))
-  else
-    "Bad event type: #{event_type.inspect}"
-  end
-end
 
 LAMETRIC_PUSH_URI = URI(ENV["LAMETRIC_PUSH_URL"].to_s)
 LAMETRIC_HTTP_ARGS = [
