@@ -70,7 +70,7 @@ EVENTS = {
 post "/github/events" do
   event_type = env["HTTP_X_GITHUB_EVENT"]
   if b = EVENTS[event_type]
-    b(JSON.parse(request.body.read))
+    b.call(JSON.parse(request.body.read))
   else
     "Bad event type: #{event_type.inspect}"
   end
@@ -100,6 +100,8 @@ def lametric_post(frames)
     req["X-Access-Token"] = ENV["LAMETRIC_PUSH_TOKEN"]
     http.request(req)
   end
+
+  "Pushed to LaMetric: HTTP #{res.code}"
 end
 
 def fetch_value(hash, *keys)
