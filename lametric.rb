@@ -94,7 +94,7 @@ def lametric_repo_post(repo, options = {})
         :icon => :star,
       },
       {
-        :text => repo["subscribers_count"] || repo["watchers_count"] || "?",
+        :text => repo["subscribers_count"] || "?",
         :icon => :watcher,
       },
     ],
