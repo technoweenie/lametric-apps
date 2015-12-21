@@ -49,16 +49,14 @@ end
 
 EVENTS = {
   "pull_request" => lambda { |json|
-    pull = fetch_value(json, "pull_request", "title") || "???"
-    sender = fetch_value(json, "sender", "login") || "???"
-
-
     icon = case json["action"]
     when "opened", "reopened" then :open_issue
     when "closed" then :closed_issue
     end
 
     if icon
+      pull = fetch_value(json, "pull_request", "title") || "???"
+      sender = fetch_value(json, "sender", "login") || "???"
       nwo = fetch_value(json, "repository", "full_name")
       repo = Octokit.repository(nwo)
       lametric_repo_post(repo,
@@ -88,10 +86,10 @@ LAMETRIC_HTTP_ARGS = [
 ]
 
 def lametric_repo_post(repo, options = {})
-  msg = options[:message] || repo["name"]
+  msg = options[:message] || repo.name
   first_icon = options[:icon] || :octocat
 
-  lametric_post(
+  output = lametric_post(
     [
       {
         :text => msg,
@@ -112,7 +110,7 @@ def lametric_repo_post(repo, options = {})
     ],
   )
 
-  return if options.empty?
+  return output if options.empty?
   sleep 15
   lametric_repo_post(repo)
 end
