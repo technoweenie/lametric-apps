@@ -46,6 +46,7 @@ EVENTS = {
     repo = Octokit.repository(nwo)
     lametric_repo_post(repo,
       :message => "#{repo.name}: #{pull} by #{sender}",
+      :icon => :open_issue,
     )
   },
 
@@ -88,15 +89,15 @@ def lametric_repo_post(repo, options = {})
         :icon => first_icon,
       },
       {
-        :text => repo.open_issues_count.to_s,
+        :text => "#{repo.open_issues_count}#{" +" if first_icon == :open_issue}",
         :icon => :open_issue,
       },
       {
-        :text => repo.stargazers_count.to_s,
+        :text => "#{repo.stargazers_count}#{" +" if first_icon == :star}",
         :icon => :star,
       },
       {
-        :text => repo.subscribers_count.to_s,
+        :text => "#{repo.subscribers_count}#{" +" if first_icon == :watcher}",
         :icon => :watcher,
       },
     ],
