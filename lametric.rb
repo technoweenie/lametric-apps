@@ -7,6 +7,7 @@ ICONS = {
   :octocat => "i2184",
   :star => "i635",
   :watcher => "i2185",
+  :open_issue => "i2186",
 }
 
 get "/github/repository-stats/:o/:r" do
@@ -39,32 +40,31 @@ end
 EVENTS = {
   "pull_request" => lambda { |json|
     pull = fetch_value(json, "pull_request", "title") || "???"
-    repo = fetch_value(json, "repository", "name") || "???"
     sender = fetch_value(json, "sender", "login") || "???"
 
-    lametric_post(
-      [
-        {
-          :text => "#{repo}: #{pull} by #{sender}",
-          :icon => :octocat,
-        },
-      ],
+    repo = json["repository"]
+    lametric_repo_post(repo,
+      :message => "#{repo["name"]}: #{pull} by #{sender}",
     )
+
+    sleep 10
+
+    lametric_repo_post(repo)
   },
 
   "watch" => lambda { |json|
-    repo = fetch_value(json, "repository", "name") || "???"
     stars = fetch_value(json, "repository", "stargazers_count") || "?"
     sender = fetch_value(json, "sender", "login") || "???"
 
-    lametric_post(
-      [
-        {
-          :text => "#{repo} #{sender} (#{stars})",
-          :icon => :star,
-        },
-      ],
+    repo = json["repository"]
+    lametric_repo_post(repo,
+      :message => "#{repo["name"]} by #{sender}",
+      :icon => :star,
     )
+
+    sleep 5
+
+    lametric_repo_post(repo)
   },
 }
 
@@ -82,6 +82,32 @@ LAMETRIC_HTTP_ARGS = [
   LAMETRIC_PUSH_URI.hostname, LAMETRIC_PUSH_URI.port,
   {:use_ssl => LAMETRIC_PUSH_URI.scheme == "https"}
 ]
+
+def lametric_repo_post(repo, options = {})
+  msg = options[:message] || repo["name"]
+  first_icon = options[:icon] || :octocat
+
+  lametric_post(
+    [
+      {
+        :text => msg,
+        :icon => first_icon,
+      },
+      {
+        :text => repo["open_issues_count"] || "?",
+        :icon => :open_issue,
+      },
+      {
+        :text => repo["stargazers_count"] || "?",
+        :icon => :star,
+      },
+      {
+        :text => repo["subscribers_count"] || "?",
+        :icon => :watcher,
+      },
+    ],
+  )
+end
 
 def lametric_post(frames)
   frames.each_with_index do |f, i|
